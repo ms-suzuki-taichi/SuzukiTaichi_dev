@@ -31,7 +31,7 @@ foreach ($servers as $server) {
     $conn_shop = mysql_connect($server.'-db.makeshop.local', 'copy', '{copyのパスワード}');
     mysql_select_db('makeshop', $conn_shop);
 
-    // brand_multi_imageのadminuser,brand_uid,brand_multi_image_idでPKを付けたいの重複していないかチェックするSQL
+    // brand_multi_imageのadminuser,brand_uid,brand_multi_image_idでPKを付けたいので該当するカラムが重複していないかチェックするSQL
     $sql = "select count(*) as cnt from brand_multi_image where adminuser != '' group by adminuser, brand_uid, brand_multi_image_id having cnt >= 2";
     $res = mysql_query($sql, $conn_shop);
 
@@ -64,7 +64,7 @@ echo "重複が見つかりました\n";
 
 // ファイル書き出し
 $now = new DateTime();
-$wright_path = $output_error_csv_path . $now->format('Y-m-d_H-i-s') . '.csv';
+$write_path = $output_error_csv_path . $now->format('Y-m-d_H-i-s') . '.csv';
 foreach ($no_unique_srv as $row) {
-    file_put_contents($wright_path, $row . "\n", FILE_APPEND);
+    file_put_contents($write_path, $row . "\n", FILE_APPEND);
 }
