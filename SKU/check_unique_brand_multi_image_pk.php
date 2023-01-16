@@ -1,4 +1,5 @@
 <?php
+// コーディング UTF-8
 $is_dev = true;
 
 $time_start = microtime(true);
@@ -30,21 +31,21 @@ foreach ($servers as $server) {
     $conn_shop = mysql_connect($server.'-db.makeshop.local', 'copy', '{copyのパスワード}');
     mysql_select_db('makeshop', $conn_shop);
 
+    // brand_multi_imageのadminuser,brand_uid,brand_multi_image_idでPKを付けたいの重複していないかチェックするSQL
     $sql = "select count(*) as cnt from brand_multi_image where adminuser != '' group by adminuser, brand_uid, brand_multi_image_id having cnt >= 2";
     $res = mysql_query($sql, $conn_shop);
 
     $res = mysql_fetch_array($res);
     if ($res['cnt'] == 0) {
-        // 重複が無い場合は後続の処理をスキップして次のサーバに
+        // 重複が無い
         echo 'Server: ' . $server . ' => Success' . "\n";
-        continue;
+    } else {
+        // 重複がある
+        echo 'Server: ' . $server . ' => Error' . "\n";
+        // uniqueでないサーバは後でCSVに書き出す
+        // 全件updateに失敗した場合に数十万件以上の結果が返ってくるとメモリーエラーかタイムアウトエラーで処理が止まるので対策としてサーバ名だけを残す
+        array_push($no_unique_srv, $server);
     }
-
-    echo 'Server: ' . $server . ' => DuplicateCount: ' . $res['cnt'] . "\n";
-
-    // uniqueでないサーバは後でCSVに書き出す
-    // 全件updateに失敗した場合に40万件以上の結果が返ってくるとメモリーエラーかタイムアウトエラーで処理が止まるので、サーバの番号だけ残す
-    array_push($no_unique_srv, $server);
 
     mysql_free_result($res);
     mysql_close($conn_shop);
@@ -55,11 +56,11 @@ echo "{$time} 秒\n";
 
 // エラーが無かった場合はファイル書き出しをしない
 if (empty($no_unique_srv)) {
-    echo "AllSuccess\n";
+    echo "重複はありませんでした\n";
     exit();
 }
 
-echo "Error\n";
+echo "重複が見つかりました\n";
 
 // ファイル書き出し
 $now = new DateTime();
