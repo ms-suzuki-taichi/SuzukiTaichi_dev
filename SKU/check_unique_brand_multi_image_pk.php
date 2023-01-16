@@ -37,8 +37,8 @@ foreach ($servers as $server) {
     $sql = "select count(*) as cnt from brand_multi_image group by adminuser, brand_uid, brand_multi_image_id having cnt >= 2";
     $res = mysql_query($sql, $conn_shop);
 
-    $res = mysql_fetch_array($res);
-    if ($res['cnt'] == 0) {
+    $row = mysql_fetch_array($res);
+    if ($row['cnt'] == NULL) {
         echo 'Server: ' . $server . ' => Success' . "\n";
     } else {
         echo 'Server: ' . $server . ' => Error' . "\n";
