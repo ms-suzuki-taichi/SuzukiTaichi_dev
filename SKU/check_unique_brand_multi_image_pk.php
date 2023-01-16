@@ -34,7 +34,7 @@ foreach ($servers as $server) {
     $conn_shop = mysql_connect($server.'-db.makeshop.local', 'copy', $user_copy_pass);
     mysql_select_db('makeshop', $conn_shop);
 
-    $sql = "select count(*) as cnt from brand_multi_image where adminuser != '' group by adminuser, brand_uid, brand_multi_image_id having cnt >= 2";
+    $sql = "select count(*) as cnt from brand_multi_image group by adminuser, brand_uid, brand_multi_image_id having cnt >= 2";
     $res = mysql_query($sql, $conn_shop);
 
     $res = mysql_fetch_array($res);
